@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://challenge19.github.io/</id>
-    <title>Gridea</title>
-    <updated>2019-09-10T15:41:14.477Z</updated>
+    <title>呆思不呆</title>
+    <updated>2019-09-10T15:44:26.212Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://challenge19.github.io/"/>
     <link rel="self" href="https://challenge19.github.io//atom.xml"/>
     <subtitle>呆思不呆</subtitle>
     <logo>https://challenge19.github.io//images/avatar.png</logo>
     <icon>https://challenge19.github.io//favicon.ico</icon>
-    <rights>All rights reserved 2019, Gridea</rights>
+    <rights>All rights reserved 2019, 呆思不呆</rights>
     <entry>
         <title type="html"><![CDATA[实现python-networkx网络图的可交互视图]]></title>
         <id>https://challenge19.github.io//post/python-networkx-pyqtgraph</id>
