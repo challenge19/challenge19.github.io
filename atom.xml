@@ -2,16 +2,16 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://challenge19.github.io/</id>
     <title>呆思不呆</title>
-    <updated>2019-09-10T15:44:58.959Z</updated>
+    <updated>2019-09-10T18:08:36.423Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://challenge19.github.io/"/>
     <link rel="self" href="https://challenge19.github.io//atom.xml"/>
-    <subtitle>呆思不呆</subtitle>
+    <subtitle>呆思的博客</subtitle>
     <logo>https://challenge19.github.io//images/avatar.png</logo>
     <icon>https://challenge19.github.io//favicon.ico</icon>
     <rights>All rights reserved 2019, 呆思不呆</rights>
     <entry>
-        <title type="html"><![CDATA[实现python-networkx网络图的可交互视图]]></title>
+        <title type="html"><![CDATA[实现python网络图的可交互]]></title>
         <id>https://challenge19.github.io//post/python-networkx-pyqtgraph</id>
         <link href="https://challenge19.github.io//post/python-networkx-pyqtgraph">
         </link>
@@ -68,15 +68,6 @@ class DrawGraph(QMainWindow):
         
         self.create_menu()
         
-        '''
-        #停靠窗口1
-        dock1=QDockWidget(u&quot;设置属性1&quot;,self)
-        dock1.setFeatures(QDockWidget.DockWidgetMovable)
-        dock1.setAllowedAreas(Qt.LeftDockWidgetArea|Qt.RightDockWidgetArea)
-        te1=QTextEdit()
-        dock1.setWidget(te1)
-        self.addDockWidget(Qt.LeftDockWidgetArea,dock1)
-        '''
     def create_action(  self, text, slot=None, shortcut=None, 
                         icon=None, tip=None, checkable=False, 
                         signal=&quot;triggered()&quot;):
@@ -90,7 +81,6 @@ class DrawGraph(QMainWindow):
             action.setStatusTip(tip)
         if slot is not None:
             action.triggered.connect(slot)
-            #self.connect(action, SIGNAL(signal), slot)
         if checkable:
             action.setCheckable(True)
         return action
@@ -103,14 +93,6 @@ class DrawGraph(QMainWindow):
             shortcut=&quot;Ctrl+Q&quot;, tip=&quot;Close the application&quot;)
         self.add_actions(self.file_menu, (load_file_action, None, quit_action))
     
-        self.export_menu = self.menuBar().addMenu(&quot;&amp;Export&quot;)
-        export_action = self.create_action(&quot;&amp;Export for VOSviewer&quot;, slot=self.export_vos,tip=&quot;VOSviewer&quot;)
-        self.add_actions(self.export_menu,  (export_action,))
-        
-        self.ppt_menu = self.menuBar().addMenu(&quot;&amp;PPT&quot;)
-        ppt_action = self.create_action(&quot;&amp;Generate PPT&quot;, slot=self.generate_ppt,tip=&quot;PPT&quot;)
-        self.add_actions(self.ppt_menu,  (ppt_action,))
-
 
     def add_actions(self, target, actions):
         for action in actions:
@@ -124,77 +106,9 @@ class DrawGraph(QMainWindow):
         path = unicode(QFileDialog.getOpenFileName(self, 'Open file', '', file_choices))
         if path:
             self.on_draw(path)
-    
-    def export_vos(self):
-        if self.G:
-            #print(self.g.data['pos'])
-            self.dfnodes['x'] = self.g.data['pos'][:,0]
-            self.dfnodes['y'] = self.g.data['pos'][:,1]
-            new_file_map = self.filemap.split('_')[0] + '_map_vz.txt'
-
-            self.dfnodes.to_csv(new_file_map,sep='\t',index=False)
-            print(f'生成新坐标：{new_file_map}')
-
-
-    def generate_ppt(self):
-        # import packages
-        from pptx import Presentation
-        from pptx.util import Inches
-        import pandas as pd
-        # 初始化
-        
-        prs = Presentation()
-        blank_slide_layout = prs.slide_layouts[6]
-        slide = prs.slides.add_slide(blank_slide_layout)
-        
-        ## 添加图片
-        filename = self.filemap.split('_')[0]
-        
-        img_path = f'{filename}_png.png'
-        #img_path = 'vossvg.svg'
-        left = top = Inches(0)
-        wd = 15/9*6
-        ht = 6
-        height = Inches(6)
-        pic = slide.shapes.add_picture(img_path, left, top, height=height)
-        
-        new_file_map =self.filemap.split('.')[0] + '_vz.txt'
-        df = pd.read_csv(new_file_map,sep='\t')
-        df['x'] = (df['x'] - df['x'].min())/(df['x'].max()-df['x'].min())
-        df['y'] = (df['y'] - df['y'].min())/(df['y'].max()-df['y'].min())
-
-        def fx(x):
-            left = 0.6 #左边留白
-            right = 0.6 #右边留白
-            
-            mx = wd - left-right
-            return left+x*mx
-        
-        def fy(y):
-            top = 1 #上边留白
-            bottom = 1.2 #下边留白
-            my = ht - top-bottom
-            return top + my*(1-y)
-        df['left'] = df['x'].apply(lambda x:fx(x))
-        df['top'] = df['y'].apply(lambda y:fy(y))
-
-        ## 添加标签
-        for idx in df.index:
-            left = Inches(df.loc[idx,'left'])
-            top = Inches(df.loc[idx,'top'])
-            width = Inches(1.2)
-            height = Inches(0.6)
-            txBox = slide.shapes.add_textbox(left, top, width, height)
-            tf = txBox.text_frame
-            tf.text = df.loc[idx,'label']
-        prs.save(f'{filename}_ppt.pptx')
-        print(f'生成ppt：{filename}_ppt.pptx')
-
-
-
+ 
 ########################################################
             
-    
     def on_draw(self,file_map,file_net):
        # print(file_map)
         self.G = nx.Graph()
@@ -311,12 +225,8 @@ class Graph(pg.GraphItem):
         ev.accept()
         
 def main():
-    file_map = 'D:/Data/NetViz/vos_map.txt'
-    file_net = 'D:/Data/NetViz/vos_net.txt'
-    
-    
     app = QApplication(sys.argv)
-    form = DrawGraph(file_map=file_map,file_net=file_net)
+    form = DrawGraph()
     form.show()
     app.exec_()
 
