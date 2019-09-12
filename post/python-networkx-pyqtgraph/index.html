@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://challenge19.github.io//favicon.ico?v=1568139676063">
+<link rel="shortcut icon" href="https://challenge19.github.io//favicon.ico?v=1568292444126">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://challenge19.github.io//styles/main.css">
 
@@ -30,7 +30,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://challenge19.github.io/">
-        <img src="https://challenge19.github.io//images/avatar.png?v=1568139676063" class="site-logo">
+        <img src="https://challenge19.github.io//images/avatar.png?v=1568292444126" class="site-logo">
         <h1 class="site-title">呆思不呆</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -116,27 +116,21 @@
 </li>
 </ol>
 <pre><code class="language-python"># -*- coding: utf-8 -*-
-#classname:DrawGraph
-#menuname:Draw Network
-&quot;&quot;&quot;
-Simple example of subclassing GraphItem.
-&quot;&quot;&quot;
+
 import sys
 import pyqtgraph as pg
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import numpy as np
-import random
 import networkx as nx
-import pandas as pd
-
+import random
 # Enable antialiasing for prettier plots
 #pg.setConfigOptions(antialias=True)
 
 class DrawGraph(QMainWindow):
-    def __init__(self, parent=None,file_map='',file_net=''):
+    def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
-        self.setWindowTitle('Demo: Draw Network')
+        self.setWindowTitle('NetViz')
         self.mw = pg.PlotWidget()#background=QColor(255,255,255))
         self.mw.setAspectLocked(lock=True, ratio=1)
         self.setCentralWidget(self.mw)
@@ -146,14 +140,13 @@ class DrawGraph(QMainWindow):
         self.g = Graph()
         self.G=None
         self.mw.addItem(self.g)
-        self.filemap = file_map
-        if file_map!='' and file_net!='':
-            self.on_draw(file_map,file_net)
-        
+
+
         self.create_menu()
-        
-    def create_action(  self, text, slot=None, shortcut=None, 
-                        icon=None, tip=None, checkable=False, 
+
+
+    def create_action(  self, text, slot=None, shortcut=None,
+                        icon=None, tip=None, checkable=False,
                         signal=&quot;triggered()&quot;):
         action = QAction(text, self)
         if icon is not None:
@@ -165,87 +158,63 @@ class DrawGraph(QMainWindow):
             action.setStatusTip(tip)
         if slot is not None:
             action.triggered.connect(slot)
+            #self.connect(action, SIGNAL(signal), slot)
         if checkable:
             action.setCheckable(True)
         return action
-        
-    def create_menu(self):        
+
+
+    def create_menu(self):
         self.file_menu = self.menuBar().addMenu(&quot;&amp;File&quot;)
         load_file_action = self.create_action(&quot;&amp;Open Network File&quot;,
             shortcut=&quot;Ctrl+O&quot;, slot=self.open_network,tip=&quot;Open Network File&quot;)
-        quit_action = self.create_action(&quot;&amp;Quit&quot;, slot=self.close, 
+        load_model_action = self.create_action(&quot;&amp;Karate_club&quot;,
+            slot=self.zk_network,tip=&quot;Using Karate club graph&quot;)
+        quit_action = self.create_action(&quot;&amp;Quit&quot;, slot=self.close,
             shortcut=&quot;Ctrl+Q&quot;, tip=&quot;Close the application&quot;)
-        self.add_actions(self.file_menu, (load_file_action, None, quit_action))
-    
+        self.add_actions(self.file_menu, (load_file_action, None,load_model_action, quit_action))
+
 
     def add_actions(self, target, actions):
         for action in actions:
             if action is None:
                 target.addSeparator()
             else:
-                target.addAction(action)        
-                
+                target.addAction(action)
+
     def open_network(self):
         file_choices = &quot;Network File (*.gml)&quot;
-        path = unicode(QFileDialog.getOpenFileName(self, 'Open file', '', file_choices))
+        path = QFileDialog.getOpenFileName(self, 'Open file', '', file_choices)
         if path:
-            self.on_draw(path)
- 
+            G=nx.read_gml(filename[0])
+            self.on_draw(G)
+
+    def zk_network(self):
+        G=nx.karate_club_graph()
+        self.on_draw(G)
+
 ########################################################
-            
-    def on_draw(self,file_map,file_net):
-       # print(file_map)
-        self.G = nx.Graph()
-        df_edges = pd.read_csv(file_net,sep='\t',header=None,names=['s','t','w'])
-        edgelist = [(df_edges.loc[idx,'s']-1,df_edges.loc[idx,'t']-1,df_edges.loc[idx,'w']) for idx in df_edges.index]
-        #print(edgelist)
-        self.G.add_weighted_edges_from(edgelist)
-        df_nodes = pd.read_csv(file_map,sep='\t')
-        self.dfnodes = df_nodes.copy()
-        def map_color(df):
-            import matplotlib as mpl
-            import matplotlib.cm as cm
-            import matplotlib.colors as colors
-            norm = mpl.colors.Normalize(vmin=1, vmax=df['cluster'].max())
-            cmap = cm.tab10
-            m = cm.ScalarMappable(norm=norm, cmap=cmap)
-            df['color'] = df['cluster'].apply(lambda x:m.to_rgba(x))
-            return df
-
-        df_nodes = map_color(df_nodes)
-        for idx in df_nodes.index:
-            i = df_nodes.loc[idx,'id']-1
-            label = df_nodes.loc[idx,'label']
-            cluster = df_nodes.loc[idx,'cluster']
-            self.G.nodes[i]['label'] = label
-            self.G.nodes[i]['cluster'] = cluster
-            self.G.nodes[i]['pos'] = [df_nodes.loc[idx,'x'],df_nodes.loc[idx,'y']]
-            self.G.nodes[i]['color'] = df_nodes.loc[idx,'color']
-
-#        self.G.pos=nx.layout.spring_layout(self.G)
+    def on_draw(self,G):
+        self.G = G
+        self.G.pos=nx.layout.spring_layout(self.G)
         poslist=[]
         texts=[]
         sizes=[]
-        maxsize=0.3
-        minsize=0.01
-        zooma=(maxsize-minsize)/(float(max(dict(self.G.degree).values()))+float(min(dict(self.G.degree).values())))
-        zoomb=(float(max(dict(self.G.degree).values()))*minsize-float(min(dict(self.G.degree).values()))*maxsize)/(maxsize-minsize)
         for node in sorted(self.G.nodes()):
-            poslist.append(self.G.nodes[node]['pos'])
-            texts.append(self.G.node[node]['label'])
-            sizes.append((self.G.degree(node)*0.005))
+            poslist.append(self.G.pos[node]) # node position
+            texts.append(str(node)) # node label
+            sizes.append(self.G.degree(node)*0.005) # node size
         pos = np.array(poslist, dtype=float)
-        
+
         adjlist=[]
         linelist=[]
         for edge in self.G.edges():
             adjlist.append(edge)
             linelist.append((125,125,125,122,1))
         adj = np.array(adjlist)
-        NodeColors=[QColor(self.G.nodes[i]['color'][0]*255,self.G.nodes[i]['color'][1]*255,self.G.nodes[i]['color'][2]*255) for i in self.G.nodes]
+        NodeColors=[QColor(random.randint(1,255), random.randint(1,255),random.randint(1,255)) for i in range(self.G.number_of_nodes())]
         lines = np.array(linelist, dtype=[('red',np.ubyte),('green',np.ubyte),('blue',np.ubyte),('alpha',np.ubyte),('width',float)])
-        self.g.setData(pos=pos, adj=adj, pxMode=False, size=sizes, pen=lines,symbolPen=NodeColors,symbolBrush=NodeColors, text=texts)
-
+        self.g.setData(pos=pos, adj=adj,pxMode=False,size=sizes,pen=lines,symbolPen=NodeColors,symbolBrush=NodeColors, text=texts)
 
 
 class Graph(pg.GraphItem):
@@ -254,8 +223,7 @@ class Graph(pg.GraphItem):
         self.dragOffset = None
         self.textItems = []
         pg.GraphItem.__init__(self)
-        #self.scatter.sigClicked.connect(self.clicked)
-        
+
     def setData(self, **kwds):
         self.text = kwds.pop('text', [])
         self.data = kwds
@@ -265,7 +233,7 @@ class Graph(pg.GraphItem):
             self.data['data']['index'] = np.arange(npts)
         self.setTexts(self.text)
         self.updateGraph()
-        
+
     def setTexts(self, text):
         for i in self.textItems:
             i.scene().removeItem(i)
@@ -274,18 +242,18 @@ class Graph(pg.GraphItem):
             item = pg.TextItem(t)
             self.textItems.append(item)
             item.setParentItem(self)
-        
+
     def updateGraph(self):
         pg.GraphItem.setData(self, **self.data)
         for i,item in enumerate(self.textItems):
             item.setPos(*self.data['pos'][i])
-        
-        
+
+
     def mouseDragEvent(self, ev):
         if ev.button() != Qt.LeftButton:
             ev.ignore()
             return
-        
+
         if ev.isStart():
             pos = ev.buttonDownPos()
             pts = self.scatter.pointsAt(pos)
@@ -302,12 +270,13 @@ class Graph(pg.GraphItem):
             if self.dragPoint is None:
                 ev.ignore()
                 return
-        
+
         ind = self.dragPoint.data()[0]
         self.data['pos'][ind] = ev.pos() + self.dragOffset
         self.updateGraph()
         ev.accept()
-        
+
+
 def main():
     app = QApplication(sys.argv)
     form = DrawGraph()
