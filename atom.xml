@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://challenge19.github.io/</id>
     <title>呆思不呆</title>
-    <updated>2019-09-13T04:39:25.969Z</updated>
+    <updated>2019-09-13T04:49:00.581Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://challenge19.github.io/"/>
     <link rel="self" href="https://challenge19.github.io//atom.xml"/>
@@ -16,7 +16,11 @@
         <link href="https://challenge19.github.io//post/li-yong-markdown-wan-cheng-xie-zuo">
         </link>
         <updated>2019-09-13T04:27:06.000Z</updated>
-        <content type="html"><![CDATA[<p>markdown在工作和生活写作中使用频率逐渐升高，除了利用markdown写博客（结合Gridea+Githb pages）外，以下是我常用的几个markdown工具：</p>
+        <summary type="html"><![CDATA[<p>markdown记录生活</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>markdown记录生活</p>
+<!-- more -->
+<p>markdown在工作和生活写作中使用频率逐渐升高，除了利用markdown写博客（结合Gridea+Githb pages）外，以下是我常用的几个markdown工具：</p>
 <ol>
 <li>利用markdown实现微信公众号的<a href="https://lab.lyric.im/wxformat/">排版</a></li>
 <li>利用markdown<a href="">制作ppt</a></li>
@@ -31,7 +35,11 @@
         <link href="https://challenge19.github.io//post/python-networkx-pyqtgraph">
         </link>
         <updated>2019-09-10T15:27:44.000Z</updated>
-        <content type="html"><![CDATA[<p><strong>实现网络图中的节点可以随意拖动。</strong></p>
+        <summary type="html"><![CDATA[<p>python networkx + pyqtgraph实现交互式网络图</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>python networkx + pyqtgraph实现交互式网络图</p>
+<!-- more -->
+<p><strong>实现网络图中的节点可以随意拖动。</strong></p>
 <h2 id="解决方案">解决方案</h2>
 <ol>
 <li><a href="https://github.com/jsexauer/networkx_viewer">networkx_viewer</a>：暂停开发比较久
